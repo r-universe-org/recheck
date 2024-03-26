@@ -1,0 +1,15 @@
+name: 'Delete packages'
+description: 'Delete removed packages from the package server'
+inputs:
+  package:
+    description: 'Name of the package'
+    required: true
+  universe:
+    description: 'Which universe to check in'
+    required: false
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/r-universe-org/delete-packages'
+  env:
+    PACKAGE: ${{ inputs.package }}
+    UNIVERSE: ${{ inputs.universe }}
