@@ -20,11 +20,13 @@ revdep_check <- function(sourcepkg, which = "strong"){
   cran <- utils::available.packages(repos = 'https://cloud.r-project.org')
   revdeps <- tools::package_dependencies(pkg, db = cran, reverse = TRUE)[[pkg]]
   set_source_repos()
+  cat("::group::Running checks\n")
   tools::check_packages_in_dir(checkdir, basename(sourcepkg),
                                reverse = 'https://cloud.r-project.org',
                                which = which,
                                Ncpus = parallel::detectCores(),
                                check_args = c('--no-manual'))
+  cat("::endgroup::\n")
   tools::summarize_check_packages_in_dir_results(checkdir)
   tools::check_packages_in_dir_details(checkdir)
 }

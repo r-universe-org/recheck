@@ -1,4 +1,6 @@
 preinstall_linux_binaries <- function(pkg, which = 'strong'){
+  cat("::group::Preparing dependencies\n")
+  on.exit(cat("::endgroup::\n"))
   rver <- getRversion()
   distro <- system2('lsb_release', '-sc', stdout = TRUE)
   options(HTTPUserAgent = sprintf("R/%s R (%s); r-universe (%s)", rver, paste(rver, R.version$platform, R.version$arch, R.version$os), distro))
