@@ -6,14 +6,13 @@ preinstall_linux_binaries <- function(pkg, which = 'strong'){
   cran <- sprintf("https://p3m.dev/cran/__linux__/%s/latest", distro)
   repos <- c(cran, bioc)
   db <- utils::available.packages(repos = repos)
-  revdeps <- c(pkg, tools::package_dependencies(pkg, db = db, reverse = TRUE, which = which)[[pkg]])
-  strongdeps <- tools::package_dependencies(revdeps, db = db, recursive = TRUE)
-  strongpkgs <- unlist(lapply(revdeps, function(x){
-    c(rev(strongdeps[[x]]), x)
+  tocheck <- c(pkg, tools::package_dependencies(pkg, db = db, reverse = TRUE, which = which)[[pkg]])
+  checkdeps <- unique(unlist(unname(tools::package_dependencies(tocheck, db = db, which = 'most'))))
+  alldeps <- tools::package_dependencies(checkdeps, db = db, recursive = TRUE)
+  packages <- unlist(lapply(checkdeps, function(x){
+    c(rev(alldeps[[x]]), x)
   }))
-  softdeps <- tools::package_dependencies(revdeps, db = db, which = 'most')
-  packages <- unique(c(strongpkgs, unlist(unname(softdeps))))
-  packages <- intersect(packages, row.names(db))
+  packages <- intersect(unique(packages), row.names(db))
   packages <- setdiff(packages, loadedNamespaces())
   versions <- db[packages, 'Version']
   mirrors <- db[packages, 'Repository']
