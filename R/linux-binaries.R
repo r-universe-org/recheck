@@ -5,8 +5,9 @@ preinstall_linux_binaries <- function(pkg, which = 'strong'){
   bioc <- sprintf("https://bioc.r-universe.dev/bin/linux/%s/4/", distro)
   cran <- sprintf("https://p3m.dev/cran/__linux__/%s/latest", distro)
   repos <- c(cran, bioc)
-  db <- utils::available.packages(repos = repos)
-  tocheck <- c(pkg, tools::package_dependencies(pkg, db = db, reverse = TRUE, which = which)[[pkg]])
+  db <- utils::available.packages(repos = c(CRAN = cran, BIOC = bioc, official_bioc_repos()))
+  crandb <- utils::available.packages(repos = c(cran, bioc))
+  tocheck <- c(pkg, tools::package_dependencies(pkg, db = crandb, reverse = TRUE, which = which)[[pkg]])
   checkdeps <- unique(unlist(unname(tools::package_dependencies(tocheck, db = db, which = 'most'))))
   alldeps <- tools::package_dependencies(checkdeps, db = db, recursive = TRUE)
   packages <- unlist(lapply(checkdeps, function(x){
@@ -31,4 +32,13 @@ preinstall_linux_binaries <- function(pkg, which = 'strong'){
     res <- res[res$ok,]
   }
   utils::install.packages(res$destfile, repos = NULL, Ncpus = parallel::detectCores())
+}
+
+official_bioc_repos <- function(){
+  version <- utils:::.BioC_version_associated_with_R_version()
+  sprintf(c(
+    BioCsoft = "https://bioconductor.org/packages/%s/bioc",
+    BioCann = "https://bioconductor.org/packages/%s/data/annotation",
+    BioCexp = "https://bioconductor.org/packages/%s/data/experiment"
+  ), version)
 }
