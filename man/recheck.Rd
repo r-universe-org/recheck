@@ -4,17 +4,13 @@
 \alias{revdep_check}
 \title{Reverse Dependency Check}
 \usage{
-revdep_check(pkg, checkdir = "recheck", which = "strong", recursive = FALSE)
+revdep_check(sourcepkg, which = "strong")
 }
 \arguments{
-\item{pkg}{name of a package}
+\item{sourcepkg}{path to a source package tarball}
 
-\item{checkdir}{directory where revdeps are downloaded and checked.}
-
-\item{which}{passed to \code{tools::package_dependencies}}
-
-\item{recursive}{passed to \code{tools::package_dependencies}}
+\item{which}{passed to \code{tools::check_packages_in_dir}}
 }
 \description{
-Run checks on known dependents of a package.
+Run a reverse dependency check similar to CRAN.
 }

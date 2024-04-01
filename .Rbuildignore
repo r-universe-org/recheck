@@ -1,4 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^LICENSE\.md$
-^revdeps$
+^Dockerfile$
+^\.git$
+^\.github$
+^LICENSE.md$
+^action.yml$
+^entrypoint.sh$

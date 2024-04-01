@@ -8,7 +8,6 @@ Description: Runs a reverse dependency check in a similar manner as CRAN incomin
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: 
-    curl,
-    pak
+    curl
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
