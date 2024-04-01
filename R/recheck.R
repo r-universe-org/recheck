@@ -8,6 +8,10 @@
 #' @param which passed to `tools::check_packages_in_dir`. Set "most" to
 #' also check reverse suggests.
 revdep_check <- function(sourcepkg, which = "strong"){
+  if(grepl('^https:', sourcepkg)){
+    curl::curl_download(sourcepkg, basename(sourcepkg))
+    sourcepkg <- basename(sourcepkg)
+  }
   pkg <- sub("_.*", "", basename(sourcepkg))
   if(grepl("Linux", Sys.info()[['sysname']])){
     preinstall_linux_binaries(pkg, which = which)
@@ -15,7 +19,7 @@ revdep_check <- function(sourcepkg, which = "strong"){
   checkdir <- dirname(sourcepkg)
   cran <- utils::available.packages(repos = 'https://cloud.r-project.org')
   revdeps <- tools::package_dependencies(pkg, db = cran, reverse = TRUE)[[pkg]]
-  #set_source_repos()
+  set_source_repos()
   tools::check_packages_in_dir(checkdir, basename(sourcepkg),
                                reverse = 'https://cloud.r-project.org',
                                which = which,
