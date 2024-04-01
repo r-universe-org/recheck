@@ -1,15 +1,15 @@
-name: 'Delete packages'
-description: 'Delete removed packages from the package server'
+name: 'Run a recheck'
+description: 'Runs a reverse dependency check similar to CRAN'
 inputs:
   package:
-    description: 'Name of the package'
+    description: 'Path or URL to source package tarball'
     required: true
   universe:
     description: 'Which universe to check in'
     required: false
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/r-universe-org/delete-packages'
+  image: 'docker://ghcr.io/r-universe-org/recheck'
   env:
     PACKAGE: ${{ inputs.package }}
     UNIVERSE: ${{ inputs.universe }}
