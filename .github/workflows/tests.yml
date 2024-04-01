@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 600
     steps:
+      - name: Free some disk space
+        run: rm -Rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
       - name: Test recheck
         uses: r-universe-org/recheck@HEAD
         with:
