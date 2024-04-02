@@ -25,6 +25,11 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
       utils::install.packages(packages, dependencies = TRUE)
     }
   })
+  check_args <- character()
+  if(nchar(Sys.which('pdflatex')) == 0){
+    message("No pdflatex found, skipping pdf checks")
+    check_args <- c(check_args, '--no-manual --no-build-vignettes')
+  }
   group_output("Running checks", {
     Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
     oldrepos <- set_official_repos()
@@ -32,10 +37,10 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
     tools::check_packages_in_dir(checkdir, basename(sourcepkg),
                                  reverse = list(repos = repos, which = which),
                                  Ncpus = parallel::detectCores(),
-                                 check_args = c(''))
+                                 check_args = check_args)
   })
   group_output("Check results details", {
-    tools::check_packages_in_dir_details(checkdir)
+    print(tools::check_packages_in_dir_details(checkdir))
   })
   tools::summarize_check_packages_in_dir_results(checkdir)
 }
