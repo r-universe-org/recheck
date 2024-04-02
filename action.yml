@@ -10,6 +10,5 @@ inputs:
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/r-universe-org/recheck'
-  env:
-    PACKAGE: ${{ inputs.package }}
-    UNIVERSE: ${{ inputs.universe }}
+  args:
+    - ${{ inputs.package }}

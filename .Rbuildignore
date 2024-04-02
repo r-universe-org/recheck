@@ -6,3 +6,4 @@
 ^LICENSE.md$
 ^action.yml$
 ^entrypoint.sh$
+^.*_recheck$
