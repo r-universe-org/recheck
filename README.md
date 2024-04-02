@@ -33,6 +33,14 @@ via https://p3m.dev and https://r-universe.dev. This is one reason results might
 be slighlty different from what CRAN would show, though in practice it is rarely 
 an issue.
 
+## On rcheckserver
+
+On GitHub actions we run the check inside the [rcheckserver](https://github.com/r-devel/rcheckserver)
+container. This container has exactly the same system libraries installed as the
+CRAN Debian server. Therefore we do not need to worry about system requirements: 
+if the package can be built on CRAN, it can also build in the rcheckserver containers.
+
+
 ## How to use
 
 This will check your package and reverse dependencies from CRAN:
