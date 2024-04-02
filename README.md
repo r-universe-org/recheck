@@ -2,15 +2,20 @@
 
 Some helpers to run a reverse dependency check using the same tools as CRAN.
 
-## Please read this
+## Goals and limitations
 
 A reverse dependency check is not a red/green test. You should see it more as a
-diagnostic tool to identify potential issues to look investigate.
+diagnostic tool to identify potential issues to investigate.
 
-Checks results from other packages may be influenced by all kind of factors, 
-related to the platform, hardware, network, system setup, or plain random.
-We try to get results close to CRAN, but we need to make some trade offs to keep
-this practical.
+Checks results from other packages are be influenced by all sorts of factors 
+specific to the platform, hardware, network, system setup, or just plain random.
+We try to create a setup and get results similar to CRAN, but we need to make 
+some trade offs to keep this practical.
+
+Our goal of to provide a simple tool that can run on free infrastructure which
+allows you to check for potential problems with reverse dependencies during the 
+development process. It is up to you to interpret these check results, and 
+possibly compare them against what you can see on CRAN to identify regressions.
 
 
 ## Supported platfroms
