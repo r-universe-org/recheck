@@ -21,6 +21,7 @@ revdep_check <- function(sourcepkg, which = "strong"){
   revdeps <- tools::package_dependencies(pkg, db = cran, reverse = TRUE)[[pkg]]
   set_source_repos()
   cat("::group::Running checks\n")
+  Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
   tools::check_packages_in_dir(checkdir, basename(sourcepkg),
                                reverse = 'https://cloud.r-project.org',
                                which = which,
