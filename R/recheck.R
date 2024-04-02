@@ -16,10 +16,10 @@ revdep_check <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-p
   pkg <- sub("_.*", "", basename(sourcepkg))
   checkdir <- dirname(sourcepkg)
   cran <- utils::available.packages(repos = repos)
-  packages <- c(pkg, tools::package_dependencies(pkg, db = cran, reverse = TRUE)[[pkg]])
+  packages <- c(pkg, tools::package_dependencies(pkg, db = cran, which = which, reverse = TRUE)[[pkg]])
   cat("::group::Preparing dependencies\n")
   if(grepl("Linux", Sys.info()[['sysname']])){
-    preinstall_linux_binaries(packages, which = which)
+    preinstall_linux_binaries(packages)
   } else {
     install.packages(packages, dependencies = TRUE)
   }

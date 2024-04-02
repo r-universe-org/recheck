@@ -3,7 +3,7 @@
 #'  - Try to get precompiled binaries when available (mainly on ubuntu)
 #'  - Download files in parallel using curl
 #' The latter can be removed once fixed in base-R: https://github.com/r-devel/r-svn/pull/155
-preinstall_linux_binaries <- function(packages, which = 'strong'){
+preinstall_linux_binaries <- function(packages){
   rver <- getRversion()
   distro <- system2('lsb_release', '-sc', stdout = TRUE)
   options(HTTPUserAgent = sprintf("R/%s R (%s); r-universe (%s)", rver, paste(rver, R.version$platform, R.version$arch, R.version$os), distro))
