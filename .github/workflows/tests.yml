@@ -21,4 +21,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: checklogs
-          path: '*.Rcheck'
+          path: |
+            */*.log
+            */*.out
+            */*.Rout
+            */*.fail
