@@ -18,6 +18,7 @@ revdep_check <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-p
   cran <- utils::available.packages(repos = repos)
   packages <- c(pkg, tools::package_dependencies(pkg, db = cran, which = which, reverse = TRUE)[[pkg]])
   cat("::group::Preparing dependencies\n")
+  oldtimeout <- options(timeout = 600)
   if(grepl("Linux", Sys.info()[['sysname']])){
     preinstall_linux_binaries(packages)
   } else {
@@ -26,11 +27,10 @@ revdep_check <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-p
   cat("::endgroup::\n")
   cat("::group::Running checks\n")
   Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
-  old <- set_official_repos()
-  on.exit(options(repos = old), add = TRUE)
+  oldrepos <- set_official_repos()
+  on.exit(options(c(oldrepos, oldtimeout)), add = TRUE)
   tools::check_packages_in_dir(checkdir, basename(sourcepkg),
-                               reverse = repos,
-                               which = which,
+                               reverse = list(repos = repos, which = which),
                                Ncpus = parallel::detectCores(),
                                check_args = c('--no-manual'))
   cat("::endgroup::\n")
@@ -44,10 +44,10 @@ set_official_repos <- function(){
   return(old)
 }
 
-test_revdep_check <- function(pkg){
+test_revdep_check <- function(pkg, which = 'strong'){
   checkdir <- paste(pkg, 'recheck', sep = '_')
   unlink(checkdir, recursive = TRUE)
   dir.create(checkdir)
   utils::download.packages(pkg, checkdir, repos = 'https://cloud.r-project.org')
-  revdep_check(list.files(checkdir, pattern = 'tar.gz$', full.names = TRUE))
+  revdep_check(list.files(checkdir, pattern = 'tar.gz$', full.names = TRUE), which = which)
 }
