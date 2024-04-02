@@ -17,25 +17,27 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
   checkdir <- dirname(sourcepkg)
   cran <- utils::available.packages(repos = repos)
   packages <- c(pkg, tools::package_dependencies(pkg, db = cran, which = which, reverse = TRUE)[[pkg]])
-  cat("::group::Preparing dependencies\n")
-  oldtimeout <- options(timeout = 600)
-  if(grepl("Linux", Sys.info()[['sysname']])){
-    preinstall_linux_binaries(packages)
-  } else {
-    install.packages(packages, dependencies = TRUE)
-  }
-  cat("::endgroup::\n")
-  cat("::group::Running checks\n")
-  Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
-  oldrepos <- set_official_repos()
-  on.exit(options(c(oldrepos, oldtimeout)), add = TRUE)
-  tools::check_packages_in_dir(checkdir, basename(sourcepkg),
-                               reverse = list(repos = repos, which = which),
-                               Ncpus = parallel::detectCores(),
-                               check_args = c('--no-manual'))
-  cat("::endgroup::\n")
+  group_output("Preparing dependencies", {
+    oldtimeout <- options(timeout = 600)
+    if(grepl("Linux", Sys.info()[['sysname']])){
+      preinstall_linux_binaries(packages)
+    } else {
+      utils::install.packages(packages, dependencies = TRUE)
+    }
+  })
+  group_output("Running checks", {
+    Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
+    oldrepos <- set_official_repos()
+    on.exit(options(c(oldrepos, oldtimeout)), add = TRUE)
+    tools::check_packages_in_dir(checkdir, basename(sourcepkg),
+                                 reverse = list(repos = repos, which = which),
+                                 Ncpus = parallel::detectCores(),
+                                 check_args = c('--no-manual'))
+  })
+  group_output("Check results details", {
+    tools::check_packages_in_dir_details(checkdir)
+  })
   tools::summarize_check_packages_in_dir_results(checkdir)
-  tools::check_packages_in_dir_details(checkdir)
 }
 
 set_official_repos <- function(){
@@ -44,10 +46,19 @@ set_official_repos <- function(){
   return(old)
 }
 
-test_revdep_check <- function(pkg, which = 'strong'){
+group_output<- function(title, expr){
+  if(Sys.getenv('CI') != ""){
+    cat("::group::", title, "\n", sep = "")
+    on.exit(cat("::endgroup::\n"))
+  }
+  cat("===========", title, "===========\n")
+  eval(expr)
+}
+
+test_recheck <- function(pkg, which = 'strong'){
   checkdir <- paste(pkg, 'recheck', sep = '_')
   unlink(checkdir, recursive = TRUE)
   dir.create(checkdir)
   utils::download.packages(pkg, checkdir, repos = 'https://cloud.r-project.org')
-  revdep_check(list.files(checkdir, pattern = 'tar.gz$', full.names = TRUE), which = which)
+  recheck(list.files(checkdir, pattern = 'tar.gz$', full.names = TRUE), which = which)
 }
