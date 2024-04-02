@@ -32,7 +32,7 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
     tools::check_packages_in_dir(checkdir, basename(sourcepkg),
                                  reverse = list(repos = repos, which = which),
                                  Ncpus = parallel::detectCores(),
-                                 check_args = c('--no-manual'))
+                                 check_args = c(''))
   })
   group_output("Check results details", {
     tools::check_packages_in_dir_details(checkdir)
