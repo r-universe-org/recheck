@@ -4,11 +4,11 @@
 #'
 #' @export
 #' @rdname recheck
-#' @param sourcepkg path to a source package tarball
-#' @param repos vector of repos to find reverse dependencies
+#' @param sourcepkg path or URL to a source package tarball
+#' @param repos vector of repos to look for reverse dependencies
 #' @param which passed to `tools::package_dependencies`; set to "most" to
 #' also check reverse suggests.
-revdep_check <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org'){
+recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org'){
   if(grepl('^https:', sourcepkg)){
     curl::curl_download(sourcepkg, basename(sourcepkg))
     sourcepkg <- basename(sourcepkg)
