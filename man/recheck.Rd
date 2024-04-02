@@ -4,12 +4,19 @@
 \alias{revdep_check}
 \title{Reverse Dependency Check}
 \usage{
-revdep_check(sourcepkg, which = "strong")
+revdep_check(
+  sourcepkg,
+  which = "strong",
+  repos = "https://cloud.r-project.org"
+)
 }
 \arguments{
 \item{sourcepkg}{path to a source package tarball}
 
-\item{which}{passed to \code{tools::check_packages_in_dir}}
+\item{which}{passed to \code{tools::package_dependencies}; set to "most" to
+also check reverse suggests.}
+
+\item{repos}{vector of repos to find reverse dependencies}
 }
 \description{
 Run a reverse dependency check similar to CRAN.
