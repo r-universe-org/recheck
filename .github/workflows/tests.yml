@@ -18,3 +18,7 @@ jobs:
         uses: r-universe-org/recheck@HEAD
         with:
           package: ${{ github.event.inputs.package_url }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checklogs
+          path: '*.Rcheck'
