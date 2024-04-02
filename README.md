@@ -14,8 +14,11 @@ keep this practical.
 
 The goal of to provide a simple tool that can run on free infrastructure to quickly
 check for potential problems with reverse dependencies of your package. It is still
-up to you to interpret the check results, and possibly compare them against other
-results to identify regressions.
+up to you to interpret the results, and possibly compare them with results shown 
+on CRAN to identify regressions.
+
+You can also run the tool twice with two different versions of your package but we
+do not do this by default right now.
 
 ## Supported platfroms
 
@@ -45,7 +48,7 @@ CRAN Debian server. Therefore we do not need to worry about system requirements:
 if the package can be built on CRAN, it can also build in the rcheckserver containers.
 
 
-## How to use in local R
+## How to run locally
 
 This will check your package and reverse dependencies from CRAN in your local R:
 
@@ -53,9 +56,29 @@ This will check your package and reverse dependencies from CRAN in your local R:
 recheck::recheck("mypackage_1.0.tar.gz")
 ```
 
-To run this on GitHub actions use:
+Alternatively to run it in the Ubuntu container, you need to mount a local source package in the container and then pass the path as an argument. For example:
 
+```sh
+# Download some example file:
+# curl -OL "https://ropensci.r-universe.dev/src/contrib/qpdf_1.3.3.tar.gz"
+docker run -it \
+  -v "qpdf_1.3.3.tar.gz:/qpdf_1.3.3.tar.gz" \
+  ghcr.io/r-universe-org/recheck "/qpdf_1.3.3.tar.gz"
 ```
 
+Or you can pass a URL to a public source package:
+
+```sh
+docker run -it ghcr.io/r-universe-org/recheck \
+  "https://ropensci.r-universe.dev/src/contrib/qpdf_1.3.3.tar.gz"
 ```
+
+## How to run on GitHub Actions
+
+It is possible to run a reverse dependency check on GitHub actions, but note that their hardware can be slow and has limited disk space. Also there is an overall time limit of 6 hours per run. But if your package has less than 100 reverse dependencies this should usually not be an issue.
+
+
+
+
+
 
