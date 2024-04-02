@@ -1,6 +1,9 @@
-preinstall_linux_binaries <- function(pkg, which = 'strong'){
-  cat("::group::Preparing dependencies\n")
-  on.exit(cat("::endgroup::\n"))
+#' The goal of this function is to speed up installation of dependencies.
+#' This is done in two ways:
+#'  - Try to get precompiled binaries when available (mainly on ubuntu)
+#'  - Download files in parallel using curl
+#' The latter can be removed once fixed in base-R: https://github.com/r-devel/r-svn/pull/155
+preinstall_linux_binaries <- function(packages, which = 'strong'){
   rver <- getRversion()
   distro <- system2('lsb_release', '-sc', stdout = TRUE)
   options(HTTPUserAgent = sprintf("R/%s R (%s); r-universe (%s)", rver, paste(rver, R.version$platform, R.version$arch, R.version$os), distro))
@@ -8,9 +11,7 @@ preinstall_linux_binaries <- function(pkg, which = 'strong'){
   cran <- sprintf("https://p3m.dev/cran/__linux__/%s/latest", distro)
   repos <- c(cran, bioc)
   db <- utils::available.packages(repos = c(CRAN = cran, BIOC = bioc, official_bioc_repos()))
-  crandb <- utils::available.packages(repos = c(cran, bioc))
-  tocheck <- c(pkg, tools::package_dependencies(pkg, db = crandb, reverse = TRUE, which = which)[[pkg]])
-  checkdeps <- unique(unlist(unname(tools::package_dependencies(tocheck, db = db, which = 'most'))))
+  checkdeps <- unique(unlist(unname(tools::package_dependencies(packages, db = db, which = 'most'))))
   alldeps <- tools::package_dependencies(checkdeps, db = db, recursive = TRUE)
   packages <- unlist(lapply(checkdeps, function(x){
     c(rev(alldeps[[x]]), x)

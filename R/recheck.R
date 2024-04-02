@@ -5,25 +5,31 @@
 #' @export
 #' @rdname recheck
 #' @param sourcepkg path to a source package tarball
+#' @param repos vector of repos to find reverse dependencies
 #' @param which passed to `tools::check_packages_in_dir`. Set "most" to
 #' also check reverse suggests.
-revdep_check <- function(sourcepkg, which = "strong"){
+revdep_check <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org'){
   if(grepl('^https:', sourcepkg)){
     curl::curl_download(sourcepkg, basename(sourcepkg))
     sourcepkg <- basename(sourcepkg)
   }
   pkg <- sub("_.*", "", basename(sourcepkg))
-  if(grepl("Linux", Sys.info()[['sysname']])){
-    preinstall_linux_binaries(pkg, which = which)
-  }
   checkdir <- dirname(sourcepkg)
-  cran <- utils::available.packages(repos = 'https://cloud.r-project.org')
-  revdeps <- tools::package_dependencies(pkg, db = cran, reverse = TRUE)[[pkg]]
-  set_source_repos()
+  cran <- utils::available.packages(repos = repos)
+  packages <- c(pkg, tools::package_dependencies(pkg, db = cran, reverse = TRUE)[[pkg]])
+  cat("::group::Preparing dependencies\n")
+  if(grepl("Linux", Sys.info()[['sysname']])){
+    preinstall_linux_binaries(packages, which = which)
+  } else {
+    install.packages(packages, dependencies = TRUE)
+  }
+  cat("::endgroup::\n")
   cat("::group::Running checks\n")
   Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
+  old <- set_official_repos()
+  on.exit(options(repos = old), add = TRUE)
   tools::check_packages_in_dir(checkdir, basename(sourcepkg),
-                               reverse = 'https://cloud.r-project.org',
+                               reverse = repos,
                                which = which,
                                Ncpus = parallel::detectCores(),
                                check_args = c('--no-manual'))
@@ -32,9 +38,10 @@ revdep_check <- function(sourcepkg, which = "strong"){
   tools::check_packages_in_dir_details(checkdir)
 }
 
-set_source_repos <- function(){
-  options(repos = c(CRAN = 'https://cloud.r-project.org'))
+set_official_repos <- function(){
+  old <- options(repos = c(CRAN = 'https://cloud.r-project.org'))
   utils::setRepositories(ind = 1:4) #adds bioc
+  return(old)
 }
 
 test_revdep_check <- function(pkg){
