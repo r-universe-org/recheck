@@ -27,7 +27,7 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
       } else {
         utils::install.packages(packages, dependencies = TRUE)
         deps <- unique(unlist(unname(tools::package_dependencies(packages, recursive = TRUE))))
-        update.packages(oldPkgs = deps)
+        update.packages(oldPkgs = deps, ask = FALSE)
       }
     })
   }
