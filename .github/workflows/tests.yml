@@ -26,3 +26,4 @@ jobs:
             */*.out
             */*.Rout
             */*.fail
+            check-details.*

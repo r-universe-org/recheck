@@ -40,7 +40,10 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
                                  check_args = check_args)
   })
   group_output("Check results details", {
-    print(tools::check_packages_in_dir_details(checkdir))
+    details <- tools::check_packages_in_dir_details(checkdir)
+    write.csv(details, file.path(checkdir, 'check-details.csv'))
+    writeLines(paste(format(details), collapse = "\n\n"), file.path(checkdir, 'check-details.txt'))
+    print(details)
   })
   tools::summarize_check_packages_in_dir_results(checkdir)
 }
