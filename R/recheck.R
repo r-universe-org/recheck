@@ -8,7 +8,9 @@
 #' @param repos vector of repos to look for reverse dependencies
 #' @param which passed to `tools::package_dependencies`; set to "most" to
 #' also check reverse suggests.
-recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org'){
+#' @param preinstall_dependencies automatically install dependencies for all
+#' packages to be checked.
+recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org', preinstall_dependencies = TRUE){
   if(grepl('^https:', sourcepkg)){
     curl::curl_download(sourcepkg, basename(sourcepkg))
     sourcepkg <- basename(sourcepkg)
@@ -17,14 +19,16 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
   checkdir <- dirname(sourcepkg)
   cran <- utils::available.packages(repos = repos)
   packages <- c(pkg, tools::package_dependencies(pkg, db = cran, which = which, reverse = TRUE)[[pkg]])
-  group_output("Preparing dependencies", {
-    oldtimeout <- options(timeout = 600)
-    if(grepl("Linux", Sys.info()[['sysname']])){
-      preinstall_linux_binaries(packages)
-    } else {
-      utils::install.packages(packages, dependencies = TRUE)
-    }
-  })
+  if(preinstall_dependencies){
+    group_output("Preparing dependencies", {
+      oldtimeout <- options(timeout = 600)
+      if(grepl("Linux", Sys.info()[['sysname']])){
+        preinstall_linux_binaries(packages)
+      } else {
+        utils::install.packages(packages, dependencies = TRUE)
+      }
+    })
+  }
   check_args <- character()
   if(nchar(Sys.which('pdflatex')) == 0){
     message("No pdflatex found, skipping pdf checks")

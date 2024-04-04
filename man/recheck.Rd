@@ -4,7 +4,12 @@
 \alias{recheck}
 \title{Reverse Dependency Check}
 \usage{
-recheck(sourcepkg, which = "strong", repos = "https://cloud.r-project.org")
+recheck(
+  sourcepkg,
+  which = "strong",
+  repos = "https://cloud.r-project.org",
+  preinstall_dependencies = TRUE
+)
 }
 \arguments{
 \item{sourcepkg}{path or URL to a source package tarball}
@@ -13,6 +18,9 @@ recheck(sourcepkg, which = "strong", repos = "https://cloud.r-project.org")
 also check reverse suggests.}
 
 \item{repos}{vector of repos to look for reverse dependencies}
+
+\item{preinstall_dependencies}{automatically install dependencies for all
+packages to be checked.}
 }
 \description{
 Run a reverse dependency check similar to CRAN.
