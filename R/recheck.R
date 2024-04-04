@@ -32,6 +32,7 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
   }
   group_output("Running checks", {
     Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
+    if(.Platform$OS.type == 'windows') Sys.setenv(TAR = 'internal')
     oldrepos <- set_official_repos()
     on.exit(options(c(oldrepos, oldtimeout)), add = TRUE)
     tools::check_packages_in_dir(checkdir, basename(sourcepkg),

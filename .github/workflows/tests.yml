@@ -13,6 +13,7 @@ jobs:
     timeout-minutes: 600
     steps:
       - name: Free some disk space
+        if: runner.os == 'linux'
         run: rm -Rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
       - name: Test recheck
         uses: r-universe-org/recheck@HEAD
