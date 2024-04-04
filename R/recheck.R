@@ -26,6 +26,8 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
         preinstall_linux_binaries(packages)
       } else {
         utils::install.packages(packages, dependencies = TRUE)
+        deps <- unique(unlist(unname(tools::package_dependencies(packages, recursive = TRUE))))
+        update.packages(oldPkgs = deps)
       }
     })
   }
