@@ -6,6 +6,12 @@ on:
       package_url:
         description: 'URL to a source package tarball'
         required: true
+      which:
+        type: choice
+        description: Which reverse dependencies to check
+        options:
+        - strong
+        - most
 
 jobs:
   recheck:
@@ -19,6 +25,7 @@ jobs:
         uses: r-universe-org/recheck@HEAD
         with:
           package: ${{ github.event.inputs.package_url }}
+          which: ${{ github.event.inputs.which }}
       - uses: actions/upload-artifact@v4
         with:
           name: checklogs

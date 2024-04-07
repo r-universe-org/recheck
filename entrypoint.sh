@@ -6,6 +6,6 @@ if [ -z "$1" ]; then
   echo "You need to pass a package tarball path or URL"
   exit 1
 fi
-echo "Reverse dependency check for: ${1}"
-Rscript -e "recheck::recheck('${1}')"
+echo "Recheck for: ${1} with ${2} reverse dependencies"
+Rscript -e "recheck::recheck('${1}', '${2}')"
 echo "Action complete!"

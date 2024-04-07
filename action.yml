@@ -4,11 +4,13 @@ inputs:
   package:
     description: 'Path or URL to source package tarball'
     required: true
-  universe:
-    description: 'Which universe to check in'
+  which:
+    description: 'Should be strong or most'
+    default: strong
     required: false
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/r-universe-org/recheck'
   args:
     - ${{ inputs.package }}
+    - ${{ inputs.which }}
