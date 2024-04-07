@@ -11,9 +11,16 @@
 #' @param preinstall_dependencies automatically install dependencies for all
 #' packages to be checked.
 recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org', preinstall_dependencies = TRUE){
+  if(nchar(Sys.getenv('MY_UNIVERSE'))){
+    repos <- c(Sys.getenv('MY_UNIVERSE'), repos)
+  }
   if(grepl('^https:', sourcepkg)){
     curl::curl_download(sourcepkg, basename(sourcepkg))
     sourcepkg <- basename(sourcepkg)
+  }
+  if(!grepl("_", sourcepkg)){
+    dl <- utils::download.packages(sourcepkg, '.', repos = repos)
+    sourcepkg <- basename(dl[,2])
   }
   pkg <- sub("_.*", "", basename(sourcepkg))
   checkdir <- dirname(sourcepkg)
