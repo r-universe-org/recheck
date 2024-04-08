@@ -5,30 +5,32 @@
 #' @export
 #' @rdname recheck
 #' @param sourcepkg path or URL to a source package tarball
-#' @param repos vector of repos to look for reverse dependencies
 #' @param which passed to `tools::package_dependencies`; set to "most" to
 #' also check reverse suggests.
-#' @param preinstall_dependencies automatically install dependencies for all
+#' @param preinstall_dependencies start by installing dependencies for all
 #' packages to be checked.
-recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-project.org', preinstall_dependencies = TRUE){
-  if(nchar(Sys.getenv('MY_UNIVERSE'))){
-    repos <- c(Sys.getenv('MY_UNIVERSE'), repos)
-  }
+recheck <- function(sourcepkg, which = "strong", preinstall_dependencies = TRUE){
+  # Some temporary settings
+  oldrepos <- enable_all_repos()
+  oldtimeout <- options(timeout = 600)
+  on.exit(options(c(oldrepos, oldtimeout)), add = TRUE)
+
+  # Get the tarball
   if(grepl('^https:', sourcepkg)){
     curl::curl_download(sourcepkg, basename(sourcepkg))
     sourcepkg <- basename(sourcepkg)
   }
   if(!grepl("_", sourcepkg)){
-    dl <- utils::download.packages(sourcepkg, '.', repos = repos)
+    dl <- utils::download.packages(sourcepkg, '.')
     sourcepkg <- basename(dl[,2])
   }
   pkg <- sub("_.*", "", basename(sourcepkg))
   checkdir <- dirname(sourcepkg)
-  cran <- utils::available.packages(repos = repos)
+  cranrepo <- getOption('repos')['CRAN'] #
+  cran <- utils::available.packages(repos = cranrepo)
   packages <- c(pkg, tools::package_dependencies(pkg, db = cran, which = which, reverse = TRUE)[[pkg]])
   if(preinstall_dependencies){
     group_output("Preparing dependencies", {
-      oldtimeout <- options(timeout = 600)
       if(grepl("Linux", Sys.info()[['sysname']])){
         preinstall_linux_binaries(packages)
       } else {
@@ -46,10 +48,8 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
   group_output("Running checks", {
     Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
     if(.Platform$OS.type == 'windows') Sys.setenv(TAR = 'internal')
-    oldrepos <- set_official_repos()
-    on.exit(options(c(oldrepos, oldtimeout)), add = TRUE)
     tools::check_packages_in_dir(checkdir, basename(sourcepkg),
-                                 reverse = list(repos = repos, which = which),
+                                 reverse = list(repos = cranrepo, which = which),
                                  Ncpus = parallel::detectCores(),
                                  check_args = check_args)
   })
@@ -62,9 +62,13 @@ recheck <- function(sourcepkg, which = "strong", repos = 'https://cloud.r-projec
   tools::summarize_check_packages_in_dir_results(checkdir)
 }
 
-set_official_repos <- function(){
+enable_all_repos <- function(){
   old <- options(repos = c(CRAN = 'https://cloud.r-project.org'))
   utils::setRepositories(ind = 1:4) #adds bioc
+  my_universe <- Sys.getenv('MY_UNIVERSE')
+  if(nchar(my_universe)){
+    options(repos = c(my_universe = my_universe, getOption('repos')))
+  }
   return(old)
 }
 
