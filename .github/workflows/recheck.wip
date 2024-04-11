@@ -1,0 +1,37 @@
+name: Run a recheck
+
+jobs:
+  recheck:
+    runs-on: ubuntu-latest
+    container: r-devel/recheck
+    steps:
+      - uses: r-devel/actions/save-source
+      - uses: r-devel/actions/save-dependencies
+
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 600
+    strategy:
+      matrix:
+        version: [ old, new ]
+    steps:
+      - name: Free some disk space
+        run: rm -Rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
+
+      - uses: r-devel/actions/download-source
+
+      - uses: r-devel/actions/download-deps
+
+      - uses: r-devel/actions/check
+        with:
+          version: ${matrix.version}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checklogs
+          path: |
+            */*.log
+            */*.out
+            */*.Rout
+            */*.fail
+            check-details.*
