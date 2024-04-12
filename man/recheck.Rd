@@ -4,12 +4,7 @@
 \alias{recheck}
 \title{Reverse Dependency Check}
 \usage{
-recheck(
-  sourcepkg,
-  which = "strong",
-  repos = "https://cloud.r-project.org",
-  preinstall_dependencies = TRUE
-)
+recheck(sourcepkg, which = "strong", preinstall_dependencies = TRUE)
 }
 \arguments{
 \item{sourcepkg}{path or URL to a source package tarball}
@@ -17,9 +12,7 @@ recheck(
 \item{which}{passed to \code{tools::package_dependencies}; set to "most" to
 also check reverse suggests.}
 
-\item{repos}{vector of repos to look for reverse dependencies}
-
-\item{preinstall_dependencies}{automatically install dependencies for all
+\item{preinstall_dependencies}{start by installing dependencies for all
 packages to be checked.}
 }
 \description{
